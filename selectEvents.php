@@ -7,7 +7,7 @@ class TableRows extends RecursiveIteratorIterator {
     }
 
     function current() {
-        return "<td>" . parent::current(). "</td>";
+        return "<td>" . parent::current(). "</td>\n";
     }
 
     function beginChildren() {
@@ -36,6 +36,17 @@ try {
 
 	$iterator = new RecursiveArrayIterator($result);
 	$tableRows = new TableRows($iterator);  //returns object
+	
+	$stmt2 = $conn->prepare("SELECT 
+		event_id,
+		event_description,
+		event_presenter,
+		event_date,
+		event_time
+		FROM wdv341_event");
+    $stmt2->execute();
+	
+	
 }
 catch(PDOException $e) {
     echo "Error: " . $e->getMessage();
@@ -60,10 +71,28 @@ $conn = null;
 	<body>
 		<?php
 		if ( count($result) > 0){
+			echo "<h2>RecursiveArrayIterator method</h2>";
+			echo "<a href='https://www.w3schools.com/php/php_mysql_select.asp' target='_blank'>https://www.w3schools.com/php/php_mysql_select.asp</a>";
 			echo "<table>";
 			foreach( $tableRows as $k=>$v) {
 				echo $v;
 			 }
+			echo "</table>";
+			
+			echo "\n\n<h2>PDO fetch method</h2>";
+			echo "<a href='https://www.php.net/manual/en/pdostatement.fetch.php' target='_blank'>https://www.php.net/manual/en/pdostatement.fetch.php</a>";
+			echo "\n<table>";
+			
+			while ( $row = $stmt2 -> fetch(pdo::FETCH_ASSOC)) 
+			{
+				echo "<tr>
+					<td>$row[event_id]</td>
+					<td>$row[event_description]</td>
+					<td>$row[event_presenter]</td>
+					<td>$row[event_date]</td>
+					<td>$row[event_time]</td>
+				</tr>\n";
+			}
 			echo "</table>";
 		}else{
 			echo "<h1>No records returned</h1>";
